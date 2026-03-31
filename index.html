@@ -200,7 +200,7 @@
     <h1>Align Your Space.<br>Transform Your <em>Life.</em></h1>
     <p class="hero-founder">Mr. Devender Thukral &mdash; Corporate Vastu &amp; Astrology Consultant</p>
     <p class="hero-sub">Trusted by thousands of homes and corporate houses across India since 2001. Simple remedies, phenomenal results.</p>
-    <p class="hero-est">Delhi NCR &bull; Pan-India &bull; Online</p>
+    <p class="hero-est">Delhi &bull; Noida &bull; Gurgaon &bull; Faridabad &bull; Maharashtra &bull; Punjab &bull; Online</p>
     <div class="hero-btns">
       <a href="#contact" class="btn-primary">Book a Consultation</a>
       <a href="https://wa.me/919811443366" class="btn-secondary" target="_blank">WhatsApp Us &rarr;</a>
@@ -453,7 +453,13 @@
         </div>
       </div>
       <div>
-        <form class="contact-form" onsubmit="return false;">
+        <div id="form-success" style="display:none; border-left: 2px solid var(--gold); padding: 1.5rem; background: var(--dark-3); color: var(--text-main); font-size: 0.95rem; line-height: 1.7;">
+          Thank you for reaching out. Mr. Devender Thukral will get back to you shortly.
+        </div>
+        <div id="form-error" style="display:none; border-left: 2px solid #c0392b; padding: 1.5rem; background: var(--dark-3); color: #e07070; font-size: 0.9rem;">
+          Something went wrong. Please try again or contact us directly at vastupointindia@gmail.com.
+        </div>
+        <form class="contact-form" id="contact-form">
           <div class="form-row">
             <div class="form-field"><label>Full Name</label><input type="text" name="name" placeholder="Your name" required /></div>
             <div class="form-field"><label>Phone</label><input type="tel" name="phone" placeholder="+91 XXXXX XXXXX" /></div>
@@ -476,7 +482,7 @@
           </div>
           <div class="form-field"><label>Message</label><textarea name="message" placeholder="Describe your space, situation, or query..."></textarea></div>
           <div class="form-btns">
-            <button class="submit-btn" type="submit">Send Enquiry &rarr;</button>
+            <button class="submit-btn" type="submit" id="submit-btn">Send Enquiry &rarr;</button>
             <a href="https://wa.me/919811443366" class="wa-btn" target="_blank">&#9742; WhatsApp Us</a>
           </div>
         </form>
