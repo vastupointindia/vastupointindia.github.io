@@ -19,23 +19,89 @@
       --sans: system-ui, -apple-system, sans-serif;
     }
     html { scroll-behavior: smooth; }
-    body { background: var(--dark); color: var(--text-main); font-family: var(--sans); }
+    body { background: var(--dark); color: var(--text-main); font-family: var(--sans); overflow-x: hidden; }
+
+    /* SCROLL REVEAL ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal-scale.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    /* Stagger children */
+    .stagger-children .reveal:nth-child(1) { transition-delay: 0s; }
+    .stagger-children .reveal:nth-child(2) { transition-delay: 0.08s; }
+    .stagger-children .reveal:nth-child(3) { transition-delay: 0.16s; }
+    .stagger-children .reveal:nth-child(4) { transition-delay: 0.24s; }
+    .stagger-children .reveal:nth-child(5) { transition-delay: 0.32s; }
+    .stagger-children .reveal:nth-child(6) { transition-delay: 0.40s; }
+    .stagger-children .reveal:nth-child(7) { transition-delay: 0.48s; }
+    .stagger-children .reveal:nth-child(8) { transition-delay: 0.56s; }
 
     /* NAV */
     nav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(13,13,13,0.97);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(201,168,76,0.18);
       display: flex; align-items: center; justify-content: space-between;
       padding: 1rem 3rem;
+      transition: padding 0.3s, box-shadow 0.3s;
+    }
+    nav.scrolled {
+      padding: 0.7rem 3rem;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
     }
     .logo-main { font-size: 1rem; letter-spacing: 0.2em; color: var(--gold); font-weight: 400; text-transform: uppercase; }
     .logo-sub { font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.35em; margin-top: 2px; text-transform: uppercase; }
     .nav-links { display: flex; gap: 2.2rem; list-style: none; align-items: center; }
-    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.1em; transition: color 0.2s; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.1em; transition: color 0.2s; position: relative; }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+      background: var(--gold); transition: width 0.3s ease;
+    }
     .nav-links a:hover { color: var(--gold); }
-    .nav-cta { border: 1px solid var(--gold) !important; color: var(--gold) !important; padding: 0.4rem 1.2rem; }
-    .nav-cta:hover { background: var(--gold) !important; color: var(--dark) !important; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta { border: 1px solid var(--gold) !important; color: var(--gold) !important; padding: 0.4rem 1.2rem; transition: background 0.3s, color 0.3s, transform 0.2s !important; }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: var(--gold) !important; color: var(--dark) !important; transform: translateY(-1px); }
+
+    /* HAMBURGER */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; z-index: 200; }
+    .hamburger span { width: 24px; height: 1.5px; background: var(--gold); transition: transform 0.3s, opacity 0.3s; display: block; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(4px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(4px, -5px); }
 
     /* HERO */
     .hero {
@@ -48,20 +114,75 @@
       top: 50%; left: 50%; transform: translate(-50%,-50%);
       background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
       pointer-events: none;
+      transition: transform 0.1s ease-out;
+    }
+    /* Floating particle dots */
+    .hero-particle {
+      position: absolute; border-radius: 50%; background: var(--gold); opacity: 0;
+      animation: floatParticle 8s infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes floatParticle {
+      0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+      20% { opacity: 0.3; }
+      50% { opacity: 0.15; transform: translateY(-80px) scale(1); }
+      80% { opacity: 0.3; }
     }
     .hero-inner { position: relative; z-index: 1; max-width: 700px; }
-    .hero-line { width: 1px; height: 56px; background: linear-gradient(to bottom, transparent, var(--gold), transparent); margin: 0 auto 2rem; }
-    .hero-tag { font-size: 0.68rem; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.5rem; }
-    .hero h1 { font-family: var(--font); font-size: clamp(2.4rem, 5.5vw, 4.5rem); font-weight: 400; line-height: 1.18; color: var(--text-main); letter-spacing: 0.02em; margin-bottom: 0.5rem; }
+    .hero-line {
+      width: 1px; height: 56px;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      margin: 0 auto 2rem;
+      animation: lineGrow 1.2s ease-out both;
+    }
+    @keyframes lineGrow {
+      from { height: 0; opacity: 0; }
+      to { height: 56px; opacity: 1; }
+    }
+    .hero-tag {
+      font-size: 0.68rem; letter-spacing: 0.4em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.3s ease-out both;
+    }
+    .hero h1 {
+      font-family: var(--font); font-size: clamp(2.4rem, 5.5vw, 4.5rem); font-weight: 400;
+      line-height: 1.18; color: var(--text-main); letter-spacing: 0.02em; margin-bottom: 0.5rem;
+      animation: fadeUp 0.8s 0.5s ease-out both;
+    }
     .hero h1 em { color: var(--gold); font-style: normal; }
-    .hero-founder { font-size: 0.82rem; color: var(--gold-dim); letter-spacing: 0.2em; margin: 1rem 0 0.5rem; text-transform: uppercase; }
-    .hero-sub { font-size: 0.97rem; color: var(--text-muted); max-width: 520px; margin: 0 auto 1rem; line-height: 1.85; }
-    .hero-est { font-size: 0.72rem; color: var(--gold-dim); letter-spacing: 0.3em; margin-bottom: 2.5rem; text-transform: uppercase; }
-    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .btn-primary { padding: 0.85rem 2.5rem; border: 1px solid var(--gold); color: var(--gold); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; background: transparent; cursor: pointer; transition: background 0.25s, color 0.25s; text-decoration: none; display: inline-block; }
-    .btn-primary:hover { background: var(--gold); color: var(--dark); }
-    .btn-secondary { padding: 0.85rem 2.5rem; border: 1px solid rgba(201,168,76,0.25); color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; background: transparent; cursor: pointer; transition: border-color 0.25s, color 0.25s; text-decoration: none; display: inline-block; }
-    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+    .hero-founder {
+      font-size: 0.82rem; color: var(--gold-dim); letter-spacing: 0.2em;
+      margin: 1rem 0 0.5rem; text-transform: uppercase;
+      animation: fadeUp 0.8s 0.65s ease-out both;
+    }
+    .hero-sub {
+      font-size: 0.97rem; color: var(--text-muted); max-width: 520px;
+      margin: 0 auto 2.5rem; line-height: 1.85;
+      animation: fadeUp 0.8s 0.8s ease-out both;
+    }
+    .hero-btns {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.95s ease-out both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .btn-primary {
+      padding: 0.85rem 2.5rem; border: 1px solid var(--gold); color: var(--gold);
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      background: transparent; cursor: pointer;
+      transition: background 0.25s, color 0.25s, transform 0.2s, box-shadow 0.3s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--gold); color: var(--dark); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(201,168,76,0.2); }
+    .btn-secondary {
+      padding: 0.85rem 2.5rem; border: 1px solid rgba(201,168,76,0.25); color: var(--text-muted);
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      background: transparent; cursor: pointer;
+      transition: border-color 0.25s, color 0.25s, transform 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
     .hero-bottom { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 1px; height: 50px; background: linear-gradient(to bottom, var(--gold), transparent); }
 
     /* AWARDS STRIP */
@@ -77,7 +198,8 @@
     .section-inner { max-width: 1060px; margin: 0 auto; }
     .section-label { font-size: 0.66rem; letter-spacing: 0.45em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.9rem; display: block; }
     .section-title { font-family: var(--font); font-size: clamp(1.7rem, 2.8vw, 2.5rem); font-weight: 400; color: var(--text-main); margin-bottom: 1.2rem; line-height: 1.3; }
-    .gold-rule { width: 44px; height: 1px; background: var(--gold); margin-bottom: 2.5rem; }
+    .gold-rule { width: 44px; height: 1px; background: var(--gold); margin-bottom: 2.5rem; transition: width 0.6s ease; }
+    .gold-rule.visible { width: 60px; }
 
     /* ABOUT */
     .about { background: var(--dark-2); }
@@ -86,7 +208,8 @@
     .about-text strong { color: var(--text-main); font-weight: 400; }
     .about-right { display: flex; flex-direction: column; gap: 1.5rem; }
     .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(201,168,76,0.1); }
-    .stat-box { background: var(--dark-3); padding: 1.8rem 1.5rem; text-align: center; }
+    .stat-box { background: var(--dark-3); padding: 1.8rem 1.5rem; text-align: center; transition: background 0.3s; }
+    .stat-box:hover { background: rgba(28,28,28,0.8); }
     .stat-num { font-family: var(--font); font-size: 2rem; color: var(--gold); display: block; font-weight: 300; letter-spacing: 0.05em; }
     .stat-label { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.4rem; display: block; }
     .why-box { background: var(--dark-3); border: 1px solid rgba(201,168,76,0.12); padding: 1.8rem; }
@@ -98,7 +221,18 @@
     /* SERVICES */
     .services { background: var(--dark); }
     .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: rgba(201,168,76,0.08); margin-top: 3rem; }
-    .service-card { background: var(--dark-2); padding: 2.2rem 2rem; border-top: 2px solid transparent; transition: border-color 0.3s, background 0.3s; }
+    .service-card {
+      background: var(--dark-2); padding: 2.2rem 2rem;
+      border-top: 2px solid transparent;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(201,168,76,0.04) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.4s; pointer-events: none;
+    }
+    .service-card:hover::before { opacity: 1; }
     .service-card:hover { border-top-color: var(--gold); background: var(--dark-3); }
     .service-num { font-size: 0.65rem; letter-spacing: 0.3em; color: var(--gold-dim); margin-bottom: 1rem; display: block; }
     .service-card h3 { font-family: var(--font); font-size: 1.1rem; font-weight: 400; margin-bottom: 0.8rem; color: var(--text-main); }
@@ -111,12 +245,23 @@
     .clients { background: var(--dark-2); }
     .clients-intro { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 2.5rem; max-width: 700px; }
     .clients-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-    .client-tag { font-size: 0.78rem; color: var(--text-muted); border: 1px solid rgba(201,168,76,0.15); padding: 0.5rem 1.1rem; letter-spacing: 0.08em; }
+    .client-tag {
+      font-size: 0.78rem; color: var(--text-muted);
+      border: 1px solid rgba(201,168,76,0.15); padding: 0.5rem 1.1rem;
+      letter-spacing: 0.08em;
+      transition: border-color 0.3s, color 0.3s, transform 0.2s, background 0.3s;
+    }
+    .client-tag:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); background: rgba(201,168,76,0.04); }
 
     /* TESTIMONIALS */
     .testimonials { background: var(--dark); }
     .testi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3rem; }
-    .testi-card { background: var(--dark-3); padding: 2rem; border-left: 2px solid rgba(201,168,76,0.3); }
+    .testi-card {
+      background: var(--dark-3); padding: 2rem;
+      border-left: 2px solid rgba(201,168,76,0.3);
+      transition: border-left-color 0.3s, transform 0.3s;
+    }
+    .testi-card:hover { border-left-color: var(--gold); transform: translateY(-3px); }
     .testi-stars { color: var(--gold); font-size: 0.7rem; letter-spacing: 0.15em; margin-bottom: 1rem; }
     .testi-card p { font-size: 0.87rem; color: var(--text-muted); line-height: 1.85; margin-bottom: 1.5rem; font-style: italic; }
     .testi-name { font-size: 0.82rem; color: var(--text-main); }
@@ -127,10 +272,11 @@
     .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 5rem; align-items: start; margin-top: 3rem; }
     .contact-info h3 { font-family: var(--font); font-size: 1.05rem; font-weight: 400; color: var(--text-main); margin-bottom: 1.5rem; }
     .contact-detail { display: flex; flex-direction: column; gap: 1.2rem; }
-    .cd-item { border-left: 1px solid rgba(201,168,76,0.2); padding-left: 1rem; }
+    .cd-item { border-left: 1px solid rgba(201,168,76,0.2); padding-left: 1rem; transition: border-left-color 0.3s; }
+    .cd-item:hover { border-left-color: var(--gold); }
     .cd-label { font-size: 0.65rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.3rem; }
     .cd-val { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
-    .cd-val a { color: var(--text-muted); text-decoration: none; }
+    .cd-val a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
     .cd-val a:hover { color: var(--gold); }
     .contact-form { display: flex; flex-direction: column; gap: 1.1rem; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
@@ -141,35 +287,100 @@
       width: 100%; background: var(--dark-3); border: 1px solid rgba(201,168,76,0.18);
       border-radius: 0; color: var(--text-main); padding: 0.75rem 0.9rem;
       font-family: var(--sans); font-size: 0.88rem; outline: none;
-      transition: border-color 0.2s; appearance: none;
+      transition: border-color 0.3s, box-shadow 0.3s; appearance: none;
     }
     .form-field input:focus,
     .form-field textarea:focus,
-    .form-field select:focus { border-color: rgba(201,168,76,0.6); }
+    .form-field select:focus {
+      border-color: rgba(201,168,76,0.6);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+    }
     .form-field textarea { resize: vertical; min-height: 110px; }
     .form-field select option { background: #1C1C1C; }
     .form-btns { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
-    .submit-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 0.85rem 2.2rem; font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s, color 0.25s; }
-    .submit-btn:hover { background: var(--gold); color: var(--dark); }
-    .wa-btn { background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.25); color: #25D166; padding: 0.85rem 1.8rem; font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.25s; text-decoration: none; display: inline-block; }
-    .wa-btn:hover { background: rgba(37,211,102,0.18); }
+    .submit-btn {
+      background: transparent; border: 1px solid var(--gold); color: var(--gold);
+      padding: 0.85rem 2.2rem; font-family: var(--sans); font-size: 0.75rem;
+      letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer;
+      transition: background 0.25s, color 0.25s, transform 0.2s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .submit-btn:hover:not(:disabled) { background: var(--gold); color: var(--dark); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(201,168,76,0.2); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .submit-btn .spinner {
+      display: none; width: 14px; height: 14px; border: 2px solid transparent;
+      border-top-color: currentColor; border-radius: 50%; animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 0.5rem;
+    }
+    .submit-btn.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .wa-btn {
+      background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.25);
+      color: #25D166; padding: 0.85rem 1.8rem; font-family: var(--sans);
+      font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.25s, transform 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .wa-btn:hover { background: rgba(37,211,102,0.18); transform: translateY(-2px); }
+
+    /* Form messages */
+    #form-success {
+      display: none; border-left: 2px solid var(--gold); padding: 1.5rem;
+      background: var(--dark-3); color: var(--text-main); font-size: 0.95rem;
+      line-height: 1.7; animation: fadeUp 0.5s ease-out;
+    }
+    #form-error {
+      display: none; border-left: 2px solid #c0392b; padding: 1.5rem;
+      background: var(--dark-3); color: #e07070; font-size: 0.9rem;
+      animation: fadeUp 0.5s ease-out;
+    }
+
+    /* BACK TO TOP */
+    .back-to-top {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 90;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold); font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(10px); pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s, background 0.3s;
+    }
+    .back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .back-to-top:hover { background: var(--gold); color: var(--dark); }
 
     /* FOOTER */
-    footer { background: var(--dark-3); border-top: 1px solid rgba(201,168,76,0.12); padding: 2rem 3rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    footer {
+      background: var(--dark-3); border-top: 1px solid rgba(201,168,76,0.12);
+      padding: 2rem 3rem; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
     .footer-logo { font-size: 0.85rem; color: var(--gold); letter-spacing: 0.18em; }
     .footer-copy { font-size: 0.72rem; color: var(--text-muted); }
     .footer-links { display: flex; gap: 1.5rem; }
-    .footer-links a { font-size: 0.72rem; color: var(--text-muted); text-decoration: none; }
+    .footer-links a { font-size: 0.72rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
     .footer-links a:hover { color: var(--gold); }
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
       nav { padding: 1rem 1.5rem; }
-      .nav-links { gap: 1.2rem; }
+      nav.scrolled { padding: 0.7rem 1.5rem; }
+      .hamburger { display: flex; }
+      .nav-links {
+        position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+        background: rgba(13,13,13,0.98); backdrop-filter: blur(20px);
+        flex-direction: column; align-items: flex-start; justify-content: center;
+        padding: 3rem 2rem; gap: 2rem;
+        transition: right 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        border-left: 1px solid rgba(201,168,76,0.15);
+      }
+      .nav-links.open { right: 0; }
+      .nav-links a { font-size: 0.95rem; }
       .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
       .services-grid { grid-template-columns: 1fr; }
       .testi-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
+      .awards-inner { gap: 2rem; }
+      .award-div { display: none; }
       footer { flex-direction: column; align-items: flex-start; padding: 2rem 1.5rem; }
     }
   </style>
@@ -177,12 +388,15 @@
 <body>
 
 <!-- NAV -->
-<nav>
+<nav id="navbar">
   <div>
     <div class="logo-main">Vastu Point India</div>
     <div class="logo-sub">Est. 2001 &nbsp;&bull;&nbsp; Delhi, India</div>
   </div>
-  <ul class="nav-links">
+  <div class="hamburger" id="hamburger" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </div>
+  <ul class="nav-links" id="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#services">Services</a></li>
     <li><a href="#clients">Clients</a></li>
@@ -192,15 +406,20 @@
 </nav>
 
 <!-- HERO -->
-<div class="hero">
-  <div class="hero-glow"></div>
+<div class="hero" id="hero">
+  <div class="hero-glow" id="hero-glow"></div>
+  <!-- Floating particles -->
+  <div class="hero-particle" style="width:3px;height:3px;top:20%;left:15%;animation-delay:0s;animation-duration:7s;"></div>
+  <div class="hero-particle" style="width:2px;height:2px;top:60%;left:80%;animation-delay:2s;animation-duration:9s;"></div>
+  <div class="hero-particle" style="width:4px;height:4px;top:75%;left:25%;animation-delay:4s;animation-duration:6s;"></div>
+  <div class="hero-particle" style="width:2px;height:2px;top:30%;left:70%;animation-delay:1s;animation-duration:8s;"></div>
+  <div class="hero-particle" style="width:3px;height:3px;top:50%;left:45%;animation-delay:3s;animation-duration:10s;"></div>
   <div class="hero-inner">
     <div class="hero-line"></div>
     <p class="hero-tag">Vastu Shastra &bull; Jyotish &bull; Astrology &bull; Numerology</p>
     <h1>Align Your Space.<br>Transform Your <em>Life.</em></h1>
     <p class="hero-founder">Mr. Devender Thukral &mdash; Corporate Vastu &amp; Astrology Consultant</p>
     <p class="hero-sub">Trusted by thousands of homes and corporate houses across India since 2001. Simple remedies, phenomenal results.</p>
-    <p class="hero-est">Delhi &bull; Noida &bull; Gurgaon &bull; Faridabad &bull; Maharashtra &bull; Punjab &bull; Online</p>
     <div class="hero-btns">
       <a href="#contact" class="btn-primary">Book a Consultation</a>
       <a href="https://wa.me/919811443366" class="btn-secondary" target="_blank">WhatsApp Us &rarr;</a>
@@ -210,7 +429,7 @@
 </div>
 
 <!-- AWARDS STRIP -->
-<div class="awards">
+<div class="awards reveal">
   <div class="awards-inner">
     <div class="award-item">
       <div class="award-year">2000</div>
@@ -233,28 +452,28 @@
 <section class="about" id="about">
   <div class="section-inner">
     <div class="about-grid">
-      <div class="about-text">
+      <div class="about-text reveal-left">
         <span class="section-label">About Devender Thukral</span>
         <h2 class="section-title">A Renowned Name in Jyotish &amp; Vastu Consultancy</h2>
         <div class="gold-rule"></div>
         <p>Founded in 2001, <strong>Vastu Point India</strong> is on the panel of leading Delhi, Noida, Faridabad, Gurgaon, Maharashtra, Uttarakhand and Punjab based industry and corporate houses.</p>
         <p><strong>Mr. Devender Thukral</strong> is a corporate astrologer and vastu consultant in India. His immense and deep knowledge of Vastu Shastra has helped to change the lives of hundreds of people by successful implementation of Vastu Shastra at their factories, industries, offices, commercial spaces and residential homes across the country.</p>
-        <p>Since 2001, he has pioneered the combination of Astrology and Vastu Solutions for best results, developing a unique capability of working with corporates and creating <strong>"Kundlis for Growth"</strong>.</p>
-        <p>Be it love, relationships, children, work, finance or any other aspect of life, Mr. Devender Thukral is able to quickly relate to the individual's question and harmonize it with one's activities in both spiritual and physical ways. His solutions are very simple to follow and yield positive results in a very less period of time.</p>
+        <p>Since 2001, he has pioneered the combination of Astrology and Vastu Solutions for best results, developing a unique capability of working with corporates and creating <strong>&ldquo;Kundlis for Growth&rdquo;</strong>.</p>
+        <p>Be it love, relationships, children, work, finance or any other aspect of life, Mr. Devender Thukral is able to quickly relate to the individual&rsquo;s question and harmonize it with one&rsquo;s activities in both spiritual and physical ways. His solutions are very simple to follow and yield positive results in a very less period of time.</p>
       </div>
-      <div class="about-right">
-        <div class="about-stats">
-          <div class="stat-box"><span class="stat-num">5000+</span><span class="stat-label">Kundlis Studied</span></div>
-          <div class="stat-box"><span class="stat-num">23+</span><span class="stat-label">Years Experience</span></div>
-          <div class="stat-box"><span class="stat-num">2</span><span class="stat-label">National Awards</span></div>
-          <div class="stat-box"><span class="stat-num">Pan-India</span><span class="stat-label">&amp; Online</span></div>
+      <div class="about-right reveal-right">
+        <div class="about-stats" id="stats-container">
+          <div class="stat-box"><span class="stat-num" data-target="5000" data-suffix="+">0</span><span class="stat-label">Kundlis Studied</span></div>
+          <div class="stat-box"><span class="stat-num" data-target="23" data-suffix="+">0</span><span class="stat-label">Years Experience</span></div>
+          <div class="stat-box"><span class="stat-num" data-target="2" data-suffix="">0</span><span class="stat-label">National Awards</span></div>
+          <div class="stat-box"><span class="stat-num" data-text="Pan-India">Pan-India</span><span class="stat-label">&amp; Online</span></div>
         </div>
         <div class="why-box">
           <h4>Why Vastu Point India?</h4>
           <div class="why-item"><div class="why-dot"></div><p>We have seen over 5000+ Kundlis in the last fifteen years</p></div>
           <div class="why-item"><div class="why-dot"></div><p>We not only predict your future, but provide solutions for your present and future problems. Our remedies are made up of easy everyday things.</p></div>
-          <div class="why-item"><div class="why-dot"></div><p>Strong industrial client base which gives us experience in handling corporate queries, from beauty services to textile units — our solutions have helped everyone.</p></div>
-          <div class="why-item"><div class="why-dot"></div><p>Diligent follow-up after every consultation — Mr. Devender asks about results and quickly gives alternate remedies if previous ones are not possible.</p></div>
+          <div class="why-item"><div class="why-dot"></div><p>Strong industrial client base which gives us experience in handling corporate queries, from beauty services to textile units &mdash; our solutions have helped everyone.</p></div>
+          <div class="why-item"><div class="why-dot"></div><p>Diligent follow-up after every consultation &mdash; Mr. Devender asks about results and quickly gives alternate remedies if previous ones are not possible.</p></div>
         </div>
       </div>
     </div>
@@ -264,15 +483,15 @@
 <!-- SERVICES -->
 <section class="services" id="services">
   <div class="section-inner">
-    <span class="section-label">Our Expertise</span>
-    <h2 class="section-title">Services We Offer</h2>
-    <div class="gold-rule"></div>
-    <div class="services-grid">
+    <span class="section-label reveal">Our Expertise</span>
+    <h2 class="section-title reveal">Services We Offer</h2>
+    <div class="gold-rule reveal"></div>
+    <div class="services-grid stagger-children">
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">01</span>
         <h3>Commercial Vastu</h3>
-        <p>As per Vastu Shastra, we will guide you to organise your industry, commercial establishment, factory, godown, shop/showroom, hotel, schools &amp; college, hospital, cinema theatre or business for success — with the objective to provide you prosperity, peace and progress.</p>
+        <p>As per Vastu Shastra, we will guide you to organise your industry, commercial establishment, factory, godown, shop/showroom, hotel, schools &amp; college, hospital, cinema theatre or business for success &mdash; with the objective to provide you prosperity, peace and progress.</p>
         <p>Mr. Devender will do a site visit to your office or factory and guide on Vastu compliance from the construction stage. For existing establishments, he will guide you to make small but very important changes in sitting arrangement, machine locations, time of switching on machines and so on.</p>
         <p>We offer vastu consultancy for:</p>
         <ul class="service-bullets">
@@ -285,7 +504,7 @@
         </ul>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">02</span>
         <h3>Residential Vastu</h3>
         <p>A good home is one where every family member lives happily and feels positive energy throughout. Whether it is a house, flat, bungalow, haveli, kothi, farm house or any other place, we will give you 100% genuine and effective solutions.</p>
@@ -300,32 +519,32 @@
         <p style="margin-top:0.8rem;">Mr. Devender personally visits your home, makes a detailed study of the entire building from outside to inside and prepares an evaluation report with the most effective Vastu remedies.</p>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">03</span>
         <h3>Astrology &amp; Horoscope Reading</h3>
         <p>Astrology is one of the major arts whose presence cannot be neglected by any individual. On the basis of Dasha, Antardasha and Mahadasha, astrology can very rightly predict the future quite accurately. Not only does it predict the goods and ills of the future, but also provides appropriate remedies to recover from the odds hidden ahead.</p>
-        <p>Mr. Devender Thukral will go through the entire birth chart, read into the planetary conditions of various phases of life and give his predictions — covering the highs and lows of your past, and what the future holds for you.</p>
-        <p><strong style="color:var(--text-main);font-weight:400;">Birth Chart Rectification:</strong> For people who don't have knowledge of their exact birth time, place or date — including those born in the 1940s–60s — Mr. Devender will ask questions about your character and past and rectify your birth chart to give you the nearest time of birth.</p>
+        <p>Mr. Devender Thukral will go through the entire birth chart, read into the planetary conditions of various phases of life and give his predictions &mdash; covering the highs and lows of your past, and what the future holds for you.</p>
+        <p><strong style="color:var(--text-main);font-weight:400;">Birth Chart Rectification:</strong> For people who don&rsquo;t have knowledge of their exact birth time, place or date &mdash; including those born in the 1940s&ndash;60s &mdash; Mr. Devender will ask questions about your character and past and rectify your birth chart to give you the nearest time of birth.</p>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">04</span>
         <h3>Lal Kitab Expertise</h3>
         <p>Lal Kitab has been a mystery in itself for many years, originally from Persia. The measures suggested in Lal Kitab are very effective in solving all kinds of human troubles and tensions. Lal Kitab remedies are most powerful and give effective results to a person who follows them religiously.</p>
-        <p>After analysing your horoscope in accordance with Lal Kitab, Mr. Devender will suggest unique remedial measures to solve chronic and critical problems in your day to day life — instantly effective, completely self-defensive against planetary evils, without causing injury to anyone around you.</p>
+        <p>After analysing your horoscope in accordance with Lal Kitab, Mr. Devender will suggest unique remedial measures to solve chronic and critical problems in your day to day life &mdash; instantly effective, completely self-defensive against planetary evils, without causing injury to anyone around you.</p>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">05</span>
         <h3>Numerology &amp; Analysis</h3>
-        <p>As per your birth date, month and year, a person's character and personal traits can be judged. We will give you a detailed analysis of how you behave in life based on your birth date — and this should ideally match with your given name too.</p>
-        <p>If your current name does not match your birth date traits, Mr. Devender will suggest what changes you should make in the spellings of your name — for example, adding an extra 's' or removing an 'o'. Once the name and birth date match exactly, you will see drastic changes in everyday life, gaining popularity in your professional life and reaping the necessary benefits.</p>
+        <p>As per your birth date, month and year, a person&rsquo;s character and personal traits can be judged. We will give you a detailed analysis of how you behave in life based on your birth date &mdash; and this should ideally match with your given name too.</p>
+        <p>If your current name does not match your birth date traits, Mr. Devender will suggest what changes you should make in the spellings of your name &mdash; for example, adding an extra &lsquo;s&rsquo; or removing an &lsquo;o&rsquo;. Once the name and birth date match exactly, you will see drastic changes in everyday life, gaining popularity in your professional life and reaping the necessary benefits.</p>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">06</span>
         <h3>Puja Services</h3>
-        <p>Puja is an act of displaying veneration to God through invocations and various rituals — a gateway to establish connection with the Supreme Being. Pujas cleanse one of negative energies and provide relief from sufferings and support during difficult times.</p>
+        <p>Puja is an act of displaying veneration to God through invocations and various rituals &mdash; a gateway to establish connection with the Supreme Being. Pujas cleanse one of negative energies and provide relief from sufferings and support during difficult times.</p>
         <p>We conduct the following Puja services for our clients:</p>
         <ul class="service-bullets">
           <li>Shiv Puja, Baglamukhi Puja, Satchandi Puja</li>
@@ -337,16 +556,16 @@
         </ul>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">07</span>
         <h3>Matrimonial Alliances</h3>
         <p>We help in arranging good marriage alliances for people looking for an effective match for their children. We check Kundli Milan for wedding to verify whether you are matching with your life partner or whether there could be any problems in future life. Our fees are not exorbitant and we strive to provide very good quality matches.</p>
       </div>
 
-      <div class="service-card">
+      <div class="service-card reveal">
         <span class="service-num">08</span>
         <h3>Kundlis for Growth</h3>
-        <p>A unique corporate offering developed over more than a decade of working with India's leading industries and corporate houses. We combine Astrology and Vastu Solutions to create growth roadmaps for businesses — helping companies understand their horoscope, plan expansion, improve performance and revive underperforming units.</p>
+        <p>A unique corporate offering developed over more than a decade of working with India&rsquo;s leading industries and corporate houses. We combine Astrology and Vastu Solutions to create growth roadmaps for businesses &mdash; helping companies understand their horoscope, plan expansion, improve performance and revive underperforming units.</p>
       </div>
 
     </div>
@@ -356,30 +575,30 @@
 <!-- CLIENTS -->
 <section class="clients" id="clients">
   <div class="section-inner">
-    <span class="section-label">Our Clientele</span>
-    <h2 class="section-title">Trusted by Leading Names</h2>
-    <div class="gold-rule"></div>
-    <p class="clients-intro">We have served some big names in the market by providing Commercial Vastu services to enhance their productivity. The list below is a partial one from our side to show the rich clientele we have served over the past few years.</p>
-    <div class="clients-grid">
-      <div class="client-tag">Real Innerspring</div>
-      <div class="client-tag">Shivalik Prints</div>
-      <div class="client-tag">STL</div>
-      <div class="client-tag">Shyam Group</div>
-      <div class="client-tag">SPL</div>
-      <div class="client-tag">Dhruv</div>
-      <div class="client-tag">FIL Industries</div>
-      <div class="client-tag">O3</div>
-      <div class="client-tag">Sita</div>
-      <div class="client-tag">Sleepzone</div>
-      <div class="client-tag">Charms</div>
-      <div class="client-tag">People Bridge</div>
-      <div class="client-tag">Weave Craft</div>
-      <div class="client-tag">Pine Line</div>
-      <div class="client-tag">Steller</div>
-      <div class="client-tag">Cooper</div>
-      <div class="client-tag">Landmark Buildwell</div>
-      <div class="client-tag">Techne Engineers</div>
-      <div class="client-tag">Windorz India</div>
+    <span class="section-label reveal">Our Clientele</span>
+    <h2 class="section-title reveal">Trusted by Leading Names</h2>
+    <div class="gold-rule reveal"></div>
+    <p class="clients-intro reveal">We have served some big names in the market by providing Commercial Vastu services to enhance their productivity. The list below is a partial one from our side to show the rich clientele we have served over the past few years.</p>
+    <div class="clients-grid stagger-children">
+      <div class="client-tag reveal">Real Innerspring</div>
+      <div class="client-tag reveal">Shivalik Prints</div>
+      <div class="client-tag reveal">STL</div>
+      <div class="client-tag reveal">Shyam Group</div>
+      <div class="client-tag reveal">SPL</div>
+      <div class="client-tag reveal">Dhruv</div>
+      <div class="client-tag reveal">FIL Industries</div>
+      <div class="client-tag reveal">O3</div>
+      <div class="client-tag reveal">Sita</div>
+      <div class="client-tag reveal">Sleepzone</div>
+      <div class="client-tag reveal">Charms</div>
+      <div class="client-tag reveal">People Bridge</div>
+      <div class="client-tag reveal">Weave Craft</div>
+      <div class="client-tag reveal">Pine Line</div>
+      <div class="client-tag reveal">Steller</div>
+      <div class="client-tag reveal">Cooper</div>
+      <div class="client-tag reveal">Landmark Buildwell</div>
+      <div class="client-tag reveal">Techne Engineers</div>
+      <div class="client-tag reveal">Windorz India</div>
     </div>
   </div>
 </section>
@@ -387,35 +606,35 @@
 <!-- TESTIMONIALS -->
 <section class="testimonials" id="testimonials">
   <div class="section-inner">
-    <span class="section-label">Client Stories</span>
-    <h2 class="section-title">What Our Clients Say</h2>
-    <div class="gold-rule"></div>
+    <span class="section-label reveal">Client Stories</span>
+    <h2 class="section-title reveal">What Our Clients Say</h2>
+    <div class="gold-rule reveal"></div>
     <div class="testi-grid">
 
-      <div class="testi-card">
+      <div class="testi-card reveal-scale">
         <div class="testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"I am Geetika Malik and I represent Landmark Buildwell Pvt. Ltd. Engaged in the business of Civil Construction. We undertake projects like Hospitals, Industries, Educational institutions, Malls, Hotels etc. I would like to acknowledge the services provided by Mr. Devender Thukral for the Astro Vastu Consultancy. I have given him 4 referrals and each of them are highly satisfied with the remedies provided by him and the desired results have been phenomenal. He has knowledge of combining Vastu Shastra, Astrology &amp; Numerology and giving simple remedies for the problems encountered. He does not make them incur unnecessary expenditure or do heavy duty poojas to achieve the desired effect. His Fees are not very exorbitant and suit everyone's budget and his calm demeanor allays most problems to rest. He follows up diligently asking about the results and quickly gives alternate remedies if previous is not possible. This shows how thorough he is in his readings and is a master astrologer to be on your side. I, on behalf of my company, wish Vastu Point India &amp; Mr. Devender Thukral great success in future."</p>
+        <p>&ldquo;I am Geetika Malik and I represent Landmark Buildwell Pvt. Ltd. Engaged in the business of Civil Construction. We undertake projects like Hospitals, Industries, Educational institutions, Malls, Hotels etc. I would like to acknowledge the services provided by Mr. Devender Thukral for the Astro Vastu Consultancy. I have given him 4 referrals and each of them are highly satisfied with the remedies provided by him and the desired results have been phenomenal. He has knowledge of combining Vastu Shastra, Astrology &amp; Numerology and giving simple remedies for the problems encountered. He does not make them incur unnecessary expenditure or do heavy duty poojas to achieve the desired effect. His Fees are not very exorbitant and suit everyone&rsquo;s budget and his calm demeanor allays most problems to rest. He follows up diligently asking about the results and quickly gives alternate remedies if previous is not possible. This shows how thorough he is in his readings and is a master astrologer to be on your side. I, on behalf of my company, wish Vastu Point India &amp; Mr. Devender Thukral great success in future.&rdquo;</p>
         <div class="testi-name">Geetika Malik</div>
         <div class="testi-co">Landmark Buildwell Pvt. Ltd.</div>
       </div>
 
-      <div class="testi-card">
+      <div class="testi-card reveal-scale">
         <div class="testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"I am Jayant Samal and I represent Techne Engineers Pvt. Ltd. Which is into MEP (Plumbing, Fire &amp; Electrical) services design Consultancy. We undertake Township, Group Housing, Industries, Educational, Institute, Malls &amp; Hotels. I would like to acknowledge the services provided by Mr.Devender Thukral for the Astro Vastu Consultancy. I have given him 3 referrals and each of them are highly satisfied including met, the remedies provided by him and results are phenomenal. He gives simple remedies for the problem uncounted from the basic House hold. His fee is very nominal which suits everyone budgets. He follows up diligently asking the results and quickly gives alternatives if previous remedies don't work properly. This shows how through he is in his profession. I on behalf of my company, i wish Mr. Devender Thakral a great success in future."</p>
+        <p>&ldquo;I am Jayant Samal and I represent Techne Engineers Pvt. Ltd. Which is into MEP (Plumbing, Fire &amp; Electrical) services design Consultancy. We undertake Township, Group Housing, Industries, Educational, Institute, Malls &amp; Hotels. I would like to acknowledge the services provided by Mr. Devender Thukral for the Astro Vastu Consultancy. I have given him 3 referrals and each of them are highly satisfied including me, the remedies provided by him and results are phenomenal. He gives simple remedies for the problem encountered from the basic household. His fee is very nominal which suits everyone&rsquo;s budgets. He follows up diligently asking the results and quickly gives alternatives if previous remedies don&rsquo;t work properly. This shows how thorough he is in his profession. I on behalf of my company, wish Mr. Devender Thukral a great success in future.&rdquo;</p>
         <div class="testi-name">Jayant Samal</div>
         <div class="testi-co">Techne Engineers Pvt. Ltd.</div>
       </div>
 
-      <div class="testi-card">
+      <div class="testi-card reveal-scale">
         <div class="testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"I Ruchika Jain , Owner of Weave Craft, a Manufacturing Unit of outdoor Rattan Garden furniture &amp; retractable Roofing system in Noida would take this opportunity to appreciate, Mr. Devender Thukral , Founder of Vastu Point India for his services. I had consulted Mr. Devender Thukral regarding my company's Weave Craft's horoscope and have to say that his predictions and remedies are very accurate . Not only has the business grown even in this time of recession but also there has been a release of stress in our day to day working. Mr. Devender is now our official consultant and gives us monthly remedies .I am very positive with his guidance the company will grow leaps and bounds. All his remedies are very simple and can be easily followed . I had referred Vastu Point India to a friend of mine and she was so happy with his services that she has further referred Mr. Devender Thukral to her friends. I highly recommend Vastu Point India to all my friends and business associates and wish Mr. Devender Thukral , success in all his future endeavors. Thanks"</p>
+        <p>&ldquo;I Ruchika Jain, Owner of Weave Craft, a Manufacturing Unit of outdoor Rattan Garden furniture &amp; retractable Roofing system in Noida would take this opportunity to appreciate Mr. Devender Thukral, Founder of Vastu Point India for his services. I had consulted Mr. Devender Thukral regarding my company&rsquo;s Weave Craft&rsquo;s horoscope and have to say that his predictions and remedies are very accurate. Not only has the business grown even in this time of recession but also there has been a release of stress in our day to day working. Mr. Devender is now our official consultant and gives us monthly remedies. I am very positive with his guidance the company will grow leaps and bounds. All his remedies are very simple and can be easily followed. I had referred Vastu Point India to a friend of mine and she was so happy with his services that she has further referred Mr. Devender Thukral to her friends. I highly recommend Vastu Point India to all my friends and business associates and wish Mr. Devender Thukral, success in all his future endeavors.&rdquo;</p>
         <div class="testi-name">Ruchika Jain</div>
         <div class="testi-co">Weave Craft, Noida</div>
       </div>
 
-      <div class="testi-card">
+      <div class="testi-card reveal-scale">
         <div class="testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p>"I am Manila Jain head of business development for Windorz India Pvt. Ltd. Windorz India has been designing , fabricating and installing worldwide aluminium architectural systems and glass facades since 1994 . Our projects span varied sectors like luxury hospitality , premium residences , commercial buildings , embassies and consulates , airports and stadiums. I would like to acknowledge Mr. Devender Thukral of Vastu Point India for services given to my brother , Mr. Manish Jain CFO World , Nestle Healthcare , Geneva , Switzerland . His practical approach and scientific explanation of different facets of Vaastu and their effects on our lives has left an everlasting impression on our lives. I Manila Jain of Windorz India would highly recommend Mr. devender Thukral in future."</p>
+        <p>&ldquo;I am Manila Jain head of business development for Windorz India Pvt. Ltd. Windorz India has been designing, fabricating and installing worldwide aluminium architectural systems and glass facades since 1994. Our projects span varied sectors like luxury hospitality, premium residences, commercial buildings, embassies and consulates, airports and stadiums. I would like to acknowledge Mr. Devender Thukral of Vastu Point India for services given to my brother, Mr. Manish Jain CFO World, Nestle Healthcare, Geneva, Switzerland. His practical approach and scientific explanation of different facets of Vaastu and their effects on our lives has left an everlasting impression on our lives. I Manila Jain of Windorz India would highly recommend Mr. Devender Thukral in future.&rdquo;</p>
         <div class="testi-name">Manila Jain</div>
         <div class="testi-co">Windorz India Pvt. Ltd.</div>
       </div>
@@ -427,11 +646,11 @@
 <!-- CONTACT -->
 <section class="contact" id="contact">
   <div class="section-inner">
-    <span class="section-label">Reach Out</span>
-    <h2 class="section-title">Begin Your Journey</h2>
-    <div class="gold-rule"></div>
+    <span class="section-label reveal">Reach Out</span>
+    <h2 class="section-title reveal">Begin Your Journey</h2>
+    <div class="gold-rule reveal"></div>
     <div class="contact-grid">
-      <div class="contact-info">
+      <div class="contact-info reveal-left">
         <h3>Get in Touch with Mr. Devender Thukral</h3>
         <div class="contact-detail">
           <div class="cd-item">
@@ -440,7 +659,7 @@
           </div>
           <div class="cd-item">
             <div class="cd-label">Email</div>
-            <div class="cd-val"><a href="/cdn-cgi/l/email-protection#b0c6d1c3c4c5c0dfd9dec4d9ded4d9d1f0d7ddd1d9dc9ed3dfdd"><span class="__cf_email__" data-cfemail="cfb9aebcbbbabfa0a6a1bba6a1aba6ae8fa8a2aea6a3e1aca0a2">[email&#160;protected]</span></a></div>
+            <div class="cd-val"><a href="mailto:vastupointindia@gmail.com">vastupointindia@gmail.com</a></div>
           </div>
           <div class="cd-item">
             <div class="cd-label">Address</div>
@@ -452,22 +671,22 @@
           </div>
         </div>
       </div>
-      <div>
-        <div id="form-success" style="display:none; border-left: 2px solid var(--gold); padding: 1.5rem; background: var(--dark-3); color: var(--text-main); font-size: 0.95rem; line-height: 1.7;">
+      <div class="reveal-right">
+        <div id="form-success">
           Thank you for reaching out. Mr. Devender Thukral will get back to you shortly.
         </div>
-        <div id="form-error" style="display:none; border-left: 2px solid #c0392b; padding: 1.5rem; background: var(--dark-3); color: #e07070; font-size: 0.9rem;">
+        <div id="form-error">
           Something went wrong. Please try again or contact us directly at vastupointindia@gmail.com.
         </div>
-        <form class="contact-form" id="contact-form">
+        <form class="contact-form" id="contact-form" action="https://formspree.io/f/mnjovrkq" method="POST">
           <div class="form-row">
-            <div class="form-field"><label>Full Name</label><input type="text" name="name" placeholder="Your name" required /></div>
-            <div class="form-field"><label>Phone</label><input type="tel" name="phone" placeholder="+91 XXXXX XXXXX" /></div>
+            <div class="form-field"><label for="name">Full Name</label><input type="text" id="name" name="name" placeholder="Your name" required /></div>
+            <div class="form-field"><label for="phone">Phone</label><input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" /></div>
           </div>
-          <div class="form-field"><label>Email</label><input type="email" name="email" placeholder="your@email.com" required /></div>
+          <div class="form-field"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="your@email.com" required /></div>
           <div class="form-field">
-            <label>Service Required</label>
-            <select name="service">
+            <label for="service">Service Required</label>
+            <select id="service" name="service">
               <option value="">Select a service</option>
               <option>Commercial Vastu</option>
               <option>Residential Vastu</option>
@@ -480,9 +699,9 @@
               <option>Kundlis for Growth (Corporate)</option>
             </select>
           </div>
-          <div class="form-field"><label>Message</label><textarea name="message" placeholder="Describe your space, situation, or query..."></textarea></div>
+          <div class="form-field"><label for="message">Message</label><textarea id="message" name="message" placeholder="Describe your space, situation, or query..."></textarea></div>
           <div class="form-btns">
-            <button class="submit-btn" type="submit" id="submit-btn">Send Enquiry &rarr;</button>
+            <button class="submit-btn" type="submit" id="submit-btn"><span class="spinner"></span>Send Enquiry &rarr;</button>
             <a href="https://wa.me/919811443366" class="wa-btn" target="_blank">&#9742; WhatsApp Us</a>
           </div>
         </form>
@@ -491,10 +710,204 @@
   </div>
 </section>
 
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="back-to-top" aria-label="Back to top">&uarr;</button>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">VASTU POINT INDIA</div>
-  <div class="footer-copy">&copy; 2025 Vastu Point India. All rights reserved. &bull; Laxmi Nagar, Delhi &mdash; 110092</div>
+  <div class="footer-copy">&copy; 2026 Vastu Point India. All rights reserved. &bull; Laxmi Nagar, Delhi &mdash; 110092</div>
   <div class="footer-links">
     <a href="#about">About</a>
     <a href="#services">Services</a>
+    <a href="#clients">Clients</a>
+    <a href="#testimonials">Testimonials</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── MOBILE HAMBURGER MENU ────────────────────────────────
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('nav-links');
+  hamburger.addEventListener('click', function() {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('open');
+  });
+  // Close menu on link click
+  navLinks.querySelectorAll('a').forEach(function(a) {
+    a.addEventListener('click', function() {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('open');
+    });
+  });
+
+  // ─── NAV SHRINK ON SCROLL ─────────────────────────────────
+  var navbar = document.getElementById('navbar');
+  var backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+    // Back-to-top button
+    if (window.scrollY > 600) {
+      backToTop.classList.add('show');
+    } else {
+      backToTop.classList.remove('show');
+    }
+  });
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ─── HERO GLOW PARALLAX (mouse follow) ────────────────────
+  var heroGlow = document.getElementById('hero-glow');
+  var hero = document.getElementById('hero');
+  hero.addEventListener('mousemove', function(e) {
+    var rect = hero.getBoundingClientRect();
+    var x = ((e.clientX - rect.left) / rect.width - 0.5) * 60;
+    var y = ((e.clientY - rect.top) / rect.height - 0.5) * 60;
+    heroGlow.style.transform = 'translate(calc(-50% + ' + x + 'px), calc(-50% + ' + y + 'px))';
+  });
+
+  // ─── SERVICE CARD GLOW FOLLOW ──────────────────────────────
+  document.querySelectorAll('.service-card').forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      var rect = card.getBoundingClientRect();
+      var mx = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+      var my = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+      card.style.setProperty('--mx', mx + '%');
+      card.style.setProperty('--my', my + '%');
+    });
+  });
+
+  // ─── SCROLL REVEAL (IntersectionObserver) ──────────────────
+  var revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function(el) { observer.observe(el); });
+  } else {
+    // Fallback: show all
+    revealEls.forEach(function(el) { el.classList.add('visible'); });
+  }
+
+  // ─── ANIMATED COUNTERS ─────────────────────────────────────
+  var statsContainer = document.getElementById('stats-container');
+  var countersAnimated = false;
+  function animateCounters() {
+    if (countersAnimated) return;
+    countersAnimated = true;
+    var nums = statsContainer.querySelectorAll('.stat-num[data-target]');
+    nums.forEach(function(el) {
+      var target = parseInt(el.getAttribute('data-target'));
+      var suffix = el.getAttribute('data-suffix') || '';
+      var duration = 1800;
+      var start = 0;
+      var startTime = null;
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        // Ease-out cubic
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var current = Math.floor(eased * target);
+        el.textContent = current + suffix;
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = target + suffix;
+        }
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    var statsObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          animateCounters();
+          statsObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    statsObserver.observe(statsContainer);
+  }
+
+  // ─── FORMSPREE AJAX SUBMISSION ─────────────────────────────
+  var form = document.getElementById('contact-form');
+  var submitBtn = document.getElementById('submit-btn');
+  var formSuccess = document.getElementById('form-success');
+  var formError = document.getElementById('form-error');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Hide previous messages
+    formSuccess.style.display = 'none';
+    formError.style.display = 'none';
+
+    // Show loading state
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
+    var formData = new FormData(form);
+
+    fetch('https://formspree.io/f/mnjovrkq', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function(response) {
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+      if (response.ok) {
+        formSuccess.style.display = 'block';
+        form.style.display = 'none';
+      } else {
+        return response.json().then(function(data) {
+          throw new Error(data.errors ? data.errors.map(function(err) { return err.message; }).join(', ') : 'Form submission failed');
+        });
+      }
+    })
+    .catch(function(err) {
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+      formError.style.display = 'block';
+      console.error('Formspree error:', err);
+    });
+  });
+
+  // ─── ACTIVE NAV LINK HIGHLIGHT ─────────────────────────────
+  var sections = document.querySelectorAll('section[id]');
+  var navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', function() {
+    var scrollPos = window.scrollY + 120;
+    sections.forEach(function(sec) {
+      if (sec.offsetTop <= scrollPos && (sec.offsetTop + sec.offsetHeight) > scrollPos) {
+        var id = sec.getAttribute('id');
+        navAnchors.forEach(function(a) {
+          a.style.color = '';
+          if (a.getAttribute('href') === '#' + id && !a.classList.contains('nav-cta')) {
+            a.style.color = 'var(--gold)';
+          }
+        });
+      }
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
